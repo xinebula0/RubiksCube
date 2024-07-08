@@ -4,67 +4,56 @@ from cubedefs import Color
 class FaceCube:
     """Represent a cube on the facelet level with 54 colored facelets."""
     def __init__(self):
-        rawcolors = [Color.U, Color.R, Color.F, Color.D, Color.L, Color.B]
-        self.cubecolors = [color for color in rawcolors for i in range(9)]
+        colors = [Color.U, Color.R, Color.F, Color.D, Color.L, Color.B]
+        self.facelets = [color for color in colors for _ in range(9)]
 
     def __str__(self):
         return self.to_string()
 
-    def from_string(self, s):
+    def from_string(self, facelets):
         """Construct a facelet cube from a string.
            See class Facelet(IntEnum) in enums.py for string format.
         """
-        if len(s) < 54:
-            return 'Error: Cube definition string ' + s + ' contains less than 54 facelets.'
-        elif len(s) > 54:
-            return 'Error: Cube definition string ' + s + ' contains more than 54 facelets.'
-        for index, character in enumerate(s):
+        if len(facelets) < 54:
+            return f'Error: Cube definition string {facelets} contains less than 54 facelets.'
+        elif len(facelets) > 54:
+            return f'Error: Cube definition string {facelets} contains more than 54 facelets.'
+        cnt = [0 for _ in range(6)]
+
+        for index, character in enumerate(facelets):
             for color in Color:
                 if character == color.name:
-                    self.cubecolors[index] = color
+                    self.facelets[index] = color
+                    cnt[color.value] += 1
                     break
-        cnt = [0] * 6
-        for i in range(54):
-            if s[i] == 'U':
-                self.f[i] = Color.U
-                cnt[Color.U] += 1
-            elif s[i] == 'R':
-                self.f[i] = Color.R
-                cnt[Color.R] += 1
-            elif s[i] == 'F':
-                self.f[i] = Color.F
-                cnt[Color.F] += 1
-            elif s[i] == 'D':
-                self.f[i] = Color.D
-                cnt[Color.D] += 1
-            elif s[i] == 'L':
-                self.f[i] = Color.L
-                cnt[Color.L] += 1
-            elif s[i] == 'B':
-                self.f[i] = Color.B
-                cnt[Color.B] += 1
+
         if all(x == 9 for x in cnt):
             return True
         else:
-            return 'Error: Cube definition string ' + s + ' does not contain exactly 9 facelets of each color.'
+            return 'Error: Cube definition string ' + facelets + ' does not contain exactly 9 facelets of each color.'
+
+    def from_colors(self, colors):
+        valid_colors = ["Y", "R", "B", "W", "O", "G"]
+        facelets = ''
+        for color in colors:
+            if color not in valid_colors:
+                return f'Error: Invalid color {color} in facelet colors.'
+            for member in Color:
+                if valid_colors.index(color) == member.value:
+                    facelets += member.name
+                    break
+        self.from_string(facelets)
 
     def to_string(self):
         """Give a string representation of the facelet cube."""
-        s = ''
+        facelets = ''
         for i in range(54):
-            if self.f[i] == Color.U:
-                s += 'U'
-            elif self.f[i] == Color.R:
-                s += 'R'
-            elif self.f[i] == Color.F:
-                s += 'F'
-            elif self.f[i] == Color.D:
-                s += 'D'
-            elif self.f[i] == Color.L:
-                s += 'L'
-            elif self.f[i] == Color.B:
-                s += 'B'
-        return s
+            for member in Color:
+                if self.facelets[i] == member:
+                    facelets += member.name
+                    break
+
+        return facelets
 
     def to_2dstring(self):
         """Give a 2dstring representation of a facelet cube."""
