@@ -1,4 +1,4 @@
-from cubedefs import Color, Edge, cornerFacelet, cornerColor, edgeFacelet, edgeColor
+from cubedefs import Color, Corner, Edge, cornerFacelet, cornerColor, edgeFacelet, edgeColor
 
 
 class FaceCube:
@@ -66,18 +66,57 @@ class FaceCube:
         return r
 
     @classmethod
-    def from_stage1cube(cls, stage1cube):
+    def from_stage1cube(cls, roughcube):
         """Return a facelet representation of the cube."""
         fc = cls()
         for i in Color:
-            j = stage1cube.cp[i]  # corner j is at corner position i
-            ori = stage1cube.co[i]  # orientation of C j at position i
+            j = roughcube.cp[i]  # corner j is at corner position i
+            ori = roughcube.co[i]  # orientation of C j at position i
             for k in range(3):
                 fc.facelets[cornerFacelet[i][(k + ori) % 3]] = cornerColor[j][k]
         for i in Edge:
-            j = stage1cube.ep[i]  # similar for Es
-            ori = stage1cube.eo[i]
+            j = roughcube.ep[i]  # similar for Es
+            ori = roughcube.eo[i]
             for k in range(2):
                 fc.facelets[edgeFacelet[i][(k + ori) % 2]] = edgeColor[j][k]
         return fc
 
+
+class RoughCube:
+    """Represent a cube on level 1 with 8 corner cubies, 12 edge cubies and the cubie orientations.
+
+    Is also used to represent:
+    1. the 18 cube moves
+    2. the 48 symmetries of the cube.
+    """
+    def __init__(self, cp=None, co=None, ep=None, eo=None):
+        """
+        Initializes corners and edges.
+        :param cp: corner permutation
+        :param co: corner orientation
+        :param ep: edge permutation
+        :param eo: edge orientation
+        """
+        if cp is None:
+            self.cp = [Co(i) for i in range(8)]  # You may not put this as the default two lines above!
+        else:
+            self.cp = cp[:]
+        if co is None:
+            self.co = [0]*8
+        else:
+            self.co = co[:]
+        if ep is None:
+            self.ep = [Ed(i) for i in range(12)]
+        else:
+            self.ep = ep[:]
+        if eo is None:
+            self.eo = [0] * 12
+        else:
+            self.eo = eo[:]
+
+    def __str__(self):
+        return self.to_string()
+
+    def from_string(self, cube):
+        """Construct a stage 1 cube from a string.
+           See class Facelet(IntEnum) in enums.py for string format.

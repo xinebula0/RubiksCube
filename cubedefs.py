@@ -101,7 +101,7 @@ class Color(IntEnum):
 
 class Corner(IntEnum):
     """The names of the corner positions of the cube.
-        Corner URF e.g. has an U(p), a R(ight) and a F(ront) facelet.
+        Corner URF e.g. has a U(p), an R(ight) and an F(ront) facelet.
     """
     URF = 0
     UFL = 1
@@ -115,7 +115,7 @@ class Corner(IntEnum):
 
 class Edge(IntEnum):
     """The names of the edge positions of the cube.
-        Edge UR e.g. has an U(p) and R(ight) facelet.
+        Edge UR e.g. has a U(p) and R(ight) facelet.
     """
     UR = 0
     UF = 1
@@ -228,44 +228,56 @@ class CubeMove:
 
 class CubeMoves:
     U = CubeMove(
-        corner_permutation=[Co.UBR, Co.URF, Co.UFL, Co.ULB, Co.DFR, Co.DLF, Co.DBL, Co.DRB],
+        corner_permutation=[Corner.UBR, Corner.URF, Corner.UFL, Corner.ULB, 
+                            Corner.DFR, Corner.DLF, Corner.DBL, Corner.DRB],
         corner_orientation=[0, 0, 0, 0, 0, 0, 0, 0],
-        edge_permutation=[Ed.UB, Ed.UR, Ed.UF, Ed.UL, Ed.DR, Ed.DF, Ed.DL, Ed.DB, Ed.FR, Ed.FL, Ed.BL, Ed.BR],
+        edge_permutation=[Edge.UB, Edge.UR, Edge.UF, Edge.UL, Edge.DR, Edge.DF,
+                          Edge.DL, Edge.DB, Edge.FR, Edge.FL, Edge.BL, Edge.BR],
         edge_orientation=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     )
 
-    R = Move(
-        corner_permutation=[Co.DFR, Co.UFL, Co.ULB, Co.URF, Co.DRB, Co.DLF, Co.DBL, Co.UBR],
+    R = CubeMove(
+        corner_permutation=[Corner.DFR, Corner.UFL, Corner.ULB, Corner.URF, 
+                            Corner.DRB, Corner.DLF, Corner.DBL, Corner.UBR],
         corner_orientation=[2, 0, 0, 1, 1, 0, 0, 2],
-        edge_permutation=[Ed.FR, Ed.UF, Ed.UL, Ed.UB, Ed.BR, Ed.DF, Ed.DL, Ed.DB, Ed.DR, Ed.FL, Ed.BL, Ed.UR],
+        edge_permutation=[Edge.FR, Edge.UF, Edge.UL, Edge.UB, Edge.BR, Edge.DF,
+                          Edge.DL, Edge.DB, Edge.DR, Edge.FL, Edge.BL, Edge.UR],
         edge_orientation=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     )
 
-    F = Move(
-        corner_permutation=[Co.UFL, Co.DLF, Co.ULB, Co.UBR, Co.URF, Co.DFR, Co.DBL, Co.DRB],
+    F = CubeMove(
+        corner_permutation=[Corner.UFL, Corner.DLF, Corner.ULB, Corner.UBR, 
+                            Corner.URF, Corner.DFR, Corner.DBL, Corner.DRB],
         corner_orientation=[1, 2, 0, 0, 2, 1, 0, 0],
-        edge_permutation=[Ed.UR, Ed.FL, Ed.UL, Ed.UB, Ed.DR, Ed.FR, Ed.DL, Ed.DB, Ed.UF, Ed.DF, Ed.BL, Ed.BR],
+        edge_permutation=[Edge.UR, Edge.FL, Edge.UL, Edge.UB, Edge.DR, Edge.FR,
+                          Edge.DL, Edge.DB, Edge.UF, Edge.DF, Edge.BL, Edge.BR],
         edge_orientation=[0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0]
     )
 
-    D = Move(
-        corner_permutation=[Co.URF, Co.UFL, Co.ULB, Co.UBR, Co.DLF, Co.DBL, Co.DRB, Co.DFR],
+    D = CubeMove(
+        corner_permutation=[Corner.URF, Corner.UFL, Corner.ULB, Corner.UBR,
+                            Corner.DLF, Corner.DBL, Corner.DRB, Corner.DFR],
         corner_orientation=[0, 0, 0, 0, 0, 0, 0, 0],
-        edge_permutation=[Ed.UR, Ed.UF, Ed.UL, Ed.UB, Ed.DF, Ed.DL, Ed.DB, Ed.DR, Ed.FR, Ed.FL, Ed.BL, Ed.BR],
+        edge_permutation=[Edge.UR, Edge.UF, Edge.UL, Edge.UB, Edge.DF, Edge.DL,
+                          Edge.DB, Edge.DR, Edge.FR, Edge.FL, Edge.BL, Edge.BR],
         edge_orientation=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     )
 
-    L = Move(
-        corner_permutation=[Co.URF, Co.ULB, Co.DBL, Co.UBR, Co.DFR, Co.UFL, Co.DLF, Co.DRB],
+    L = CubeMove(
+        corner_permutation=[Corner.URF, Corner.ULB, Corner.DBL, Corner.UBR,
+                            Corner.DFR, Corner.UFL, Corner.DLF, Corner.DRB],
         corner_orientation=[0, 1, 2, 0, 0, 2, 1, 0],
-        edge_permutation=[Ed.UR, Ed.UF, Ed.BL, Ed.UB, Ed.DR, Ed.DF, Ed.FL, Ed.DB, Ed.FR, Ed.UL, Ed.DL, Ed.BR],
+        edge_permutation=[Edge.UR, Edge.UF, Edge.BL, Edge.UB, Edge.DR, Edge.DF,
+                          Edge.FL, Edge.DB, Edge.FR, Edge.UL, Edge.DL, Edge.BR],
         edge_orientation=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     )
 
-    B = Move(
-        corner_permutation=[Co.URF, Co.UFL, Co.UBR, Co.DRB, Co.DFR, Co.DLF, Co.ULB, Co.DBL],
+    B = CubeMove(
+        corner_permutation=[Corner.URF, Corner.UFL, Corner.UBR, Corner.DRB,
+                            Corner.DFR, Corner.DLF, Corner.ULB, Corner.DBL],
         corner_orientation=[0, 0, 1, 2, 0, 0, 2, 1],
-        edge_permutation=[Ed.UR, Ed.UF, Ed.UL, Ed.BR, Ed.DR, Ed.DF, Ed.DL, Ed.BL, Ed.FR, Ed.FL, Ed.UB, Ed.DB],
+        edge_permutation=[Edge.UR, Edge.UF, Edge.UL, Edge.BR, Edge.DR, Edge.DF,
+                          Edge.DL, Edge.BL, Edge.FR, Edge.FL, Edge.UB, Edge.DB],
         edge_orientation=[0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1]
     )
 
