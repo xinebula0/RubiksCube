@@ -217,6 +217,59 @@ edgeColor = [[Color.U, Color.R],
              [Color.B, Color.R]
              ]
 
+
+class CubeMove:
+    def __init__(self, corner_permutation, corner_orientation, edge_permutation, edge_orientation):
+        self.corner_permutation = corner_permutation
+        self.corner_orientation = corner_orientation
+        self.edge_permutation = edge_permutation
+        self.edge_orientation = edge_orientation
+
+
+class CubeMoves:
+    U = CubeMove(
+        corner_permutation=[Co.UBR, Co.URF, Co.UFL, Co.ULB, Co.DFR, Co.DLF, Co.DBL, Co.DRB],
+        corner_orientation=[0, 0, 0, 0, 0, 0, 0, 0],
+        edge_permutation=[Ed.UB, Ed.UR, Ed.UF, Ed.UL, Ed.DR, Ed.DF, Ed.DL, Ed.DB, Ed.FR, Ed.FL, Ed.BL, Ed.BR],
+        edge_orientation=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+
+    R = Move(
+        corner_permutation=[Co.DFR, Co.UFL, Co.ULB, Co.URF, Co.DRB, Co.DLF, Co.DBL, Co.UBR],
+        corner_orientation=[2, 0, 0, 1, 1, 0, 0, 2],
+        edge_permutation=[Ed.FR, Ed.UF, Ed.UL, Ed.UB, Ed.BR, Ed.DF, Ed.DL, Ed.DB, Ed.DR, Ed.FL, Ed.BL, Ed.UR],
+        edge_orientation=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+
+    F = Move(
+        corner_permutation=[Co.UFL, Co.DLF, Co.ULB, Co.UBR, Co.URF, Co.DFR, Co.DBL, Co.DRB],
+        corner_orientation=[1, 2, 0, 0, 2, 1, 0, 0],
+        edge_permutation=[Ed.UR, Ed.FL, Ed.UL, Ed.UB, Ed.DR, Ed.FR, Ed.DL, Ed.DB, Ed.UF, Ed.DF, Ed.BL, Ed.BR],
+        edge_orientation=[0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0]
+    )
+
+    D = Move(
+        corner_permutation=[Co.URF, Co.UFL, Co.ULB, Co.UBR, Co.DLF, Co.DBL, Co.DRB, Co.DFR],
+        corner_orientation=[0, 0, 0, 0, 0, 0, 0, 0],
+        edge_permutation=[Ed.UR, Ed.UF, Ed.UL, Ed.UB, Ed.DF, Ed.DL, Ed.DB, Ed.DR, Ed.FR, Ed.FL, Ed.BL, Ed.BR],
+        edge_orientation=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+
+    L = Move(
+        corner_permutation=[Co.URF, Co.ULB, Co.DBL, Co.UBR, Co.DFR, Co.UFL, Co.DLF, Co.DRB],
+        corner_orientation=[0, 1, 2, 0, 0, 2, 1, 0],
+        edge_permutation=[Ed.UR, Ed.UF, Ed.BL, Ed.UB, Ed.DR, Ed.DF, Ed.FL, Ed.DB, Ed.FR, Ed.UL, Ed.DL, Ed.BR],
+        edge_orientation=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )
+
+    B = Move(
+        corner_permutation=[Co.URF, Co.UFL, Co.UBR, Co.DRB, Co.DFR, Co.DLF, Co.ULB, Co.DBL],
+        corner_orientation=[0, 0, 1, 2, 0, 0, 2, 1],
+        edge_permutation=[Ed.UR, Ed.UF, Ed.UL, Ed.BR, Ed.DR, Ed.DF, Ed.DL, Ed.BL, Ed.FR, Ed.FL, Ed.UB, Ed.DB],
+        edge_orientation=[0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1]
+    )
+
+
 # ###################################### some "constants" ##############################################################
 N_PERM_4 = 24
 N_CHOOSE_8_4 = 70
@@ -237,3 +290,4 @@ N_UD_EDGES = 40320  # 8! permutations of the edges in the U-face and D-face in p
 N_SYM = 48  # number of cube symmetries of full group Oh
 N_SYM_D4h = 16  # Number of symmetries of subgroup D4h
 FOLDER = "twophase"  # Folder name for generated tables
+

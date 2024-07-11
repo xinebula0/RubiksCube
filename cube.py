@@ -1,11 +1,12 @@
-from cubedefs import Color
+from cubedefs import Color, Edge, cornerFacelet, cornerColor, edgeFacelet, edgeColor
 
 
 class FaceCube:
     """Represent a cube on the facelet level with 54 colored facelets."""
+    colors = [Color.U, Color.R, Color.F, Color.D, Color.L, Color.B]
+
     def __init__(self):
-        colors = [Color.U, Color.R, Color.F, Color.D, Color.L, Color.B]
-        self.facelets = [color for color in colors for _ in range(9)]
+        self.facelets = [color for color in self.colors for _ in range(9)]
 
     def __str__(self):
         return self.to_string()
@@ -64,36 +65,19 @@ class FaceCube:
         r += '   ' + s[27:30] + '\n   ' + s[30:33] + '\n   ' + s[33:36] + '\n'
         return r
 
-    def to_cubie_cube(self):
-        """Return a cubie representation of the facelet cube."""
-        cc = cubie.CubieCube()
-        cc.cp = [-1] * 8  # invalidate corner and edge permutation
-        cc.ep = [-1] * 12
-        for i in Corner:
-            fac = cornerFacelet[i]  # facelets of corner  at position i
-            ori = 0
-            for ori in range(3):
-                if self.f[fac[ori]] == Color.U or self.f[fac[ori]] == Color.D:
-                    break
-            col1 = self.f[fac[(ori + 1) % 3]]  # colors which identify the corner at position i
-            col2 = self.f[fac[(ori + 2) % 3]]
-            for j in Corner:
-                col = cornerColor[j]  # colors of corner j
-                if col1 == col[1] and col2 == col[2]:
-                    cc.cp[i] = j  # we have corner j in corner position i
-                    cc.co[i] = ori
-                    break
-
+    @classmethod
+    def from_stage1cube(cls, stage1cube):
+        """Return a facelet representation of the cube."""
+        fc = cls()
+        for i in Color:
+            j = stage1cube.cp[i]  # corner j is at corner position i
+            ori = stage1cube.co[i]  # orientation of C j at position i
+            for k in range(3):
+                fc.facelets[cornerFacelet[i][(k + ori) % 3]] = cornerColor[j][k]
         for i in Edge:
-            for j in Edge:
-                if self.f[edgeFacelet[i][0]] == edgeColor[j][0] and \
-                        self.f[edgeFacelet[i][1]] == edgeColor[j][1]:
-                    cc.ep[i] = j
-                    cc.eo[i] = 0
-                    break
-                if self.f[edgeFacelet[i][0]] == edgeColor[j][1] and \
-                        self.f[edgeFacelet[i][1]] == edgeColor[j][0]:
-                    cc.ep[i] = j
-                    cc.eo[i] = 1
-                    break
-        return cc
+            j = stage1cube.ep[i]  # similar for Es
+            ori = stage1cube.eo[i]
+            for k in range(2):
+                fc.facelets[edgeFacelet[i][(k + ori) % 2]] = edgeColor[j][k]
+        return fc
+
