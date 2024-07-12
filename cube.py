@@ -66,7 +66,7 @@ class FaceCube:
         return r
 
     @classmethod
-    def from_stage1cube(cls, roughcube):
+    def from_roughcube(cls, roughcube):
         """Return a facelet representation of the cube."""
         fc = cls()
         for i in Color:
@@ -97,26 +97,66 @@ class RoughCube:
         :param ep: edge permutation
         :param eo: edge orientation
         """
-        if cp is None:
-            self.cp = [Co(i) for i in range(8)]  # You may not put this as the default two lines above!
-        else:
-            self.cp = cp[:]
-        if co is None:
-            self.co = [0]*8
-        else:
-            self.co = co[:]
-        if ep is None:
-            self.ep = [Ed(i) for i in range(12)]
-        else:
-            self.ep = ep[:]
-        if eo is None:
-            self.eo = [0] * 12
-        else:
-            self.eo = eo[:]
+        self.cp = cp.copy() if cp else [member for member in Corner]
+        self.co = co.copy() if co else [0] * 8
+        self.ep = ep.copy() if ep else [member for member in Edge]
+        self.eo = eo.copy() if eo else [0] * 12
 
     def __str__(self):
-        return self.to_string()
+        """Print string for a rough cube."""
+        s = ''
+        for member in Color:
+            s += '(' + str(self.cp[member]) + ',' + str(self.co[member]) + ')'
+        s += '\n'
+        for member in Edge:
+            s += '(' + str(self.ep[member]) + ',' + str(self.eo[member]) + ')'
+        return s
 
-    def from_string(self, cube):
-        """Construct a stage 1 cube from a string.
-           See class Facelet(IntEnum) in enums.py for string format.
+    def __eq__(self, other):
+        """Define equality of two rough cubes."""
+        if self.cp == other.cp and self.co == other.co and self.ep == other.ep and self.eo == other.eo:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def to_facecube(cls, facecube:FaceCube):
+        """Return a cubie representation of the facelet cube."""
+        for member in Corner:
+            fac = cornerFacelet[member]  # find every corner and its orientation
+            for i in range(3):
+                if (facecube.facelets[fac[i]] == Color.U
+                        or facecube.facelets[fac[i]] == Color.D):
+                    break
+
+        cc = cls()
+        cc.cp = [-1] * 8  # invalidate corner and edge permutation
+        cc.ep = [-1] * 12
+        for i in Corner:
+            fac = cornerFacelet[i]  # facelets of corner  at position i
+            ori = 0
+            for ori in range(3):
+                if self.f[fac[ori]] == Color.U or self.f[fac[ori]] == Color.D:
+                    break
+            col1 = self.f[fac[(ori + 1) % 3]]  # colors which identify the corner at position i
+            col2 = self.f[fac[(ori + 2) % 3]]
+            for j in Corner:
+                col = cornerColor[j]  # colors of corner j
+                if col1 == col[1] and col2 == col[2]:
+                    cc.cp[i] = j  # we have corner j in corner position i
+                    cc.co[i] = ori
+                    break
+
+        for i in Edge:
+            for j in Edge:
+                if self.f[edgeFacelet[i][0]] == edgeColor[j][0] and \
+                        self.f[edgeFacelet[i][1]] == edgeColor[j][1]:
+                    cc.ep[i] = j
+                    cc.eo[i] = 0
+                    break
+                if self.f[edgeFacelet[i][0]] == edgeColor[j][1] and \
+                        self.f[edgeFacelet[i][1]] == edgeColor[j][0]:
+                    cc.ep[i] = j
+                    cc.eo[i] = 1
+                    break
+        return cc
