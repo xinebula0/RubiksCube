@@ -119,44 +119,65 @@ class RoughCube:
         else:
             return False
 
+    def corner_multiply(self, other):
+        """Multiply two corner cubies."""
+
+        def corner_multiply(self, b):
+            """Multiply this cubie cube with another cubie cube b, restricted to the corners. Does not change b."""
+            c_perm = [0] * 8
+            c_ori = [0] * 8
+
+            for c in Co:
+                c_perm[c] = self.cp[b.cp[c]]
+                ori_a = self.co[b.cp[c]]
+                ori_b = b.co[c]
+
+                if ori_a < 3:
+                    if ori_b < 3:
+                        ori = (ori_a + ori_b) % 3
+                    else:
+                        ori = (ori_a + ori_b) % 6 if ori_a + ori_b >= 6 else ori_a + ori_b
+                else:
+                    if ori_b < 3:
+                        ori = (ori_a - ori_b) % 3 + 3 if ori_a - ori_b < 3 else ori_a - ori_b
+                    else:
+                        ori = (ori_a - ori_b) % 3 + 3 if ori_a - ori_b < 0 else ori_a - ori_b
+
+                c_ori[c] = ori
+
+            for c in Co:
+                self.cp[c] = c_perm[c]
+                self.co[c] = c_ori[c]
+
     @classmethod
-    def to_facecube(cls, facecube:FaceCube):
+    def from_facecube(cls, facecube:FaceCube):
         """Return a cubie representation of the facelet cube."""
-        for member in Corner:
-            fac = cornerFacelet[member]  # find every corner and its orientation
+        co = list()
+        cp = list()
+        eo = list()
+        ep = list()
+
+        # find every corner and its orientation
+        for corner in cornerFacelet:
             for i in range(3):
-                if (facecube.facelets[fac[i]] == Color.U
-                        or facecube.facelets[fac[i]] == Color.D):
+                if (facecube.facelets[corner[i]] == Color.U
+                        or facecube.facelets[corner[i]] == Color.D):
+                    source = [facecube.facelets[corner[i]],
+                              facecube.facelets[corner[(i + 1) % 3]],
+                              facecube.facelets[corner[(i + 2) % 3]]]
+                    co.append(i)
+                    cp.append(cornerColor.index(source))
                     break
 
-        cc = cls()
-        cc.cp = [-1] * 8  # invalidate corner and edge permutation
-        cc.ep = [-1] * 12
-        for i in Corner:
-            fac = cornerFacelet[i]  # facelets of corner  at position i
-            ori = 0
-            for ori in range(3):
-                if self.f[fac[ori]] == Color.U or self.f[fac[ori]] == Color.D:
-                    break
-            col1 = self.f[fac[(ori + 1) % 3]]  # colors which identify the corner at position i
-            col2 = self.f[fac[(ori + 2) % 3]]
-            for j in Corner:
-                col = cornerColor[j]  # colors of corner j
-                if col1 == col[1] and col2 == col[2]:
-                    cc.cp[i] = j  # we have corner j in corner position i
-                    cc.co[i] = ori
-                    break
+        for edge in edgeFacelet:
+            source = [facecube.facelets[edge[0]],
+                      facecube.facelets[edge[1]]]
+            if source in edgeColor:
+                ep.append(edgeColor.index(source))
+                eo.append(0)
+            else:
+                source.reverse()
+                ep.append(edgeColor.index(source))
+                eo.append(1)
 
-        for i in Edge:
-            for j in Edge:
-                if self.f[edgeFacelet[i][0]] == edgeColor[j][0] and \
-                        self.f[edgeFacelet[i][1]] == edgeColor[j][1]:
-                    cc.ep[i] = j
-                    cc.eo[i] = 0
-                    break
-                if self.f[edgeFacelet[i][0]] == edgeColor[j][1] and \
-                        self.f[edgeFacelet[i][1]] == edgeColor[j][0]:
-                    cc.ep[i] = j
-                    cc.eo[i] = 1
-                    break
-        return cc
+        return cls(cp, co, ep, eo)
