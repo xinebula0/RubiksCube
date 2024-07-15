@@ -120,34 +120,98 @@ class RoughCube:
             return False
 
     def corner_multiply(self, other):
-        """Multiply two corner cubies."""
+        """Multiply this cubie cube with another cubie cube b, restricted to the corners.
+        Does not change b.
+        """
 
-        def corner_multiply(self, b):
-            """Multiply this cubie cube with another cubie cube b, restricted to the corners. Does not change b."""
-            c_perm = [0] * 8
-            c_ori = [0] * 8
+        c_perm = [0] * 8
+        c_ori = [0] * 8
 
-            for c in Co:
-                c_perm[c] = self.cp[b.cp[c]]
-                ori_a = self.co[b.cp[c]]
-                ori_b = b.co[c]
+        for c in Corner:
+            c_perm[c] = self.cp[other.cp[c]]
+            ori_a = self.co[other.cp[c]]
+            ori_b = other.co[c]
 
-                if ori_a < 3:
-                    if ori_b < 3:
-                        ori = (ori_a + ori_b) % 3
-                    else:
-                        ori = (ori_a + ori_b) % 6 if ori_a + ori_b >= 6 else ori_a + ori_b
+            if ori_a < 3:
+                if ori_b < 3:
+                    ori = (ori_a + ori_b) - 3 if ori_a + ori_b >= 3 else ori_a + ori_b
                 else:
-                    if ori_b < 3:
-                        ori = (ori_a - ori_b) % 3 + 3 if ori_a - ori_b < 3 else ori_a - ori_b
-                    else:
-                        ori = (ori_a - ori_b) % 3 + 3 if ori_a - ori_b < 0 else ori_a - ori_b
+                    ori = (ori_a + ori_b) - 3 if ori_a + ori_b >= 6 else ori_a + ori_b
+            else:
+                if ori_b < 3:
+                    ori = (ori_a - ori_b) + 3 if ori_a - ori_b < 3 else ori_a - ori_b
+                else:
+                    ori = (ori_a - ori_b) + 3 if ori_a - ori_b < 0 else ori_a - ori_b
+            c_ori[c] = ori
 
-                c_ori[c] = ori
+        for c in Corner:
+            self.cp[c] = c_perm[c]
+            self.co[c] = c_ori[c]
 
-            for c in Co:
-                self.cp[c] = c_perm[c]
-                self.co[c] = c_ori[c]
+    def edge_multiply(self, other):
+        """ Multiply this cubie cube with another cubiecube b, restricted to the edges. Does not change b."""
+        e_perm = [0] * 12
+        e_ori = [0] * 12
+        for e in Edge:
+            e_perm[e] = self.ep[other.ep[e]]
+            e_ori[e] = (other.eo[e] + self.eo[other.ep[e]]) % 2
+        for e in Edge:
+            self.ep[e] = e_perm[e]
+            self.eo[e] = e_ori[e]
+
+    def multiply(self, other):
+        self.corner_multiply(other)
+        self.edge_multiply(other)
+
+    def inv_rough_cube(self, other):
+        """Store the inverse of this rough cube in d."""
+        for e in Edge:
+            other.ep[self.ep[e]] = e
+        for e in Edge:
+            other.eo[e] = self.eo[other.ep[e]]
+
+        for c in Corner:
+            other.cp[self.cp[c]] = c
+        for c in Corner:
+            ori = self.co[other.cp[c]]
+            if ori >= 3:
+                other.co[c] = ori
+            else:
+                other.co[c] = -ori if other.co[c] >= 0 else other.co[c] + 3
+
+    def corner_parity(self):
+        """Give the parity of the corner permutation."""
+        s = 0
+        for i in range(Corner.DRB, Corner.URF, -1):
+            for j in range(i - 1, Corner.URF - 1, -1):
+                if self.cp[j] > self.cp[i]:
+                    s += 1
+        return s % 2
+
+    def edge_parity(self):
+        """Give the parity of the edge permutation. A solvable cube has the same corner and edge parity."""
+        s = 0
+        for i in range(Edge.BR, Edge.UR, -1):
+            for j in range(i - 1, Edge.UR - 1, -1):
+                if self.ep[j] > self.ep[i]:
+                    s += 1
+        return s % 2
+
+    def symmetries(self):
+        """Generate a list of the symmetries and antisymmetries of the cubie cube."""
+        from symmetries import symCube, inv_idx  # not nice here but else we have circular imports
+        s = []
+        d = CubieCube()
+        for j in range(N_SYM):
+            c = CubieCube(symCube[j].cp, symCube[j].co, symCube[j].ep, symCube[j].eo)
+            c.multiply(self)
+            c.multiply(symCube[inv_idx[j]])
+            if self == c:
+                s.append(j)
+            c.inv_cubie_cube(d)
+            if self == d:  # then we have antisymmetry
+                s.append(j + N_SYM)
+        return s
 
     @classmethod
     def from_facecube(cls, facecube:FaceCube):
