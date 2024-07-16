@@ -1,4 +1,6 @@
-from cubedefs import Color, Corner, Edge, cornerFacelet, cornerColor, edgeFacelet, edgeColor
+from cubedefs import (Color, Corner, Edge, cornerFacelet,
+                      cornerColor, edgeFacelet, edgeColor,
+                      N_SYM, CubeMoves)
 
 
 class FaceCube:
@@ -197,21 +199,35 @@ class RoughCube:
                     s += 1
         return s % 2
 
-    def symmetries(self):
+    def symmetries(self, symcube, inv_idx):
         """Generate a list of the symmetries and antisymmetries of the cubie cube."""
-        from symmetries import symCube, inv_idx  # not nice here but else we have circular imports
         s = []
-        d = CubieCube()
+        tcube = RoughCube()
         for j in range(N_SYM):
-            c = CubieCube(symCube[j].cp, symCube[j].co, symCube[j].ep, symCube[j].eo)
-            c.multiply(self)
-            c.multiply(symCube[inv_idx[j]])
-            if self == c:
+            cube = RoughCube(symcube[j].cp, symcube[j].co, symcube[j].ep, symcube[j].eo)
+            cube.multiply(self)
+            cube.multiply(symcube[inv_idx[j]])
+            if self == cube:
                 s.append(j)
-            c.inv_cubie_cube(d)
-            if self == d:  # then we have antisymmetry
+            cube.inv_rough_cube(tcube)
+            if self == tcube:  # then we have antisymmetry
                 s.append(j + N_SYM)
         return s
+
+    def get_twist(self):
+        """Get the twist of the 8 corners. 0 <= twist < 2187 in phase 1, twist = 0 in phase 2."""
+        ret = 0
+        for i in range(Corner.URF, Corner.DRB):
+            ret = 3 * ret + self.co[i]
+        return ret
+
+    def set_twist(self, twist):
+        twistparity = 0
+        for i in range(Corner.DRB - 1, Corner.URF - 1, -1):
+            self.co[i] = twist % 3
+            twistparity += self.co[i]
+            twist = twist // 3
+        self.co[Corner.DRB] = ((3 - twistparity % 3) % 3)
 
     @classmethod
     def from_facecube(cls, facecube:FaceCube):
@@ -245,3 +261,17 @@ class RoughCube:
                 eo.append(1)
 
         return cls(cp, co, ep, eo)
+
+
+basicMoveCube = list()
+for member in Color:
+    ori = getattr(CubeMoves, member.name)
+    basicMoveCube.append(RoughCube(ori.corner_permutation, ori.corner_orientation,
+                                   ori.edge_permutation, ori.edge_orientation))
+
+moveCube = list()
+for color in Color:
+    rc = RoughCube()
+    for i in range(3):
+        rc.multiply(basicMoveCube[color])
+        moveCube.append(RoughCube(rc.cp, rc.co, rc.ep, rc.eo))
